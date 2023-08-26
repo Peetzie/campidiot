@@ -1,4 +1,4 @@
-package com.example.campidiot
+package com.example.klub1000
 
 import io.flutter.embedding.android.FlutterActivity
 

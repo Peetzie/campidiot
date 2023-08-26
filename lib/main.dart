@@ -1,125 +1,162 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_sdk/spotify_sdk.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
-  runApp(const MyApp());
+class Global {
+  static bool isSpotifyConnected = false;
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  runApp(MyApp());
+}
+
+class MyPlayerWidget extends StatefulWidget {
+  @override
+  _MyPlayerWidgetState createState() => _MyPlayerWidgetState();
+}
+
+class _MyPlayerWidgetState extends State<MyPlayerWidget> {
+  bool isPlaying = false;
+  String currentTrackImage =
+      "https://img.medscapestatic.com/pi/features/drugdirectory/octupdate/AUX00011.jpg";
+  double playbackPosition = 0.0;
+  double totalDuration = 1.0;
+  String currentTrackImageUri =
+      "https://img.medscapestatic.com/pi/features/drugdirectory/octupdate/AUX00011.jpg";
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Image.network(currentTrackImageUri), // Display urrent track image
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updatePlayerState();
+  }
+
+  void _updatePlayerState() async {
+    try {
+      print("updating player state");
+      final playerState = await SpotifySdk.getPlayerState();
+      if (playerState != null) {
+        setState(() {
+          isPlaying = playerState.isPaused ? false : true;
+          currentTrackImage = playerState.track?.imageUri?.raw ??
+              "https://img.fruugo.com/product/1/87/152194871_max.jpg";
+          playbackPosition = playerState.playbackPosition?.toDouble() ?? 0.0;
+          totalDuration = playerState.track?.duration?.toDouble() ?? 1.0;
+          currentTrackImageUri = playerState.track?.imageUri?.raw ??
+              "https://img.fruugo.com/product/1/87/152194871_max.jpg";
+        });
+        print("updated player state");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      title: 'Hello World App',
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.orange,
+          title: Text('Camp Idiot - Klub 1000'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Velkommen til den årlige klub 1000'),
+              SizedBox(height: 20), // Adding some spacing
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green, // background
+                  foregroundColor: Colors.white, // foreground
+                ),
+                onPressed: () {
+                  print("pressed here");
+                  authenticateWithSpotify();
+                },
+                child: Text('Authenticate with Spotify'),
+              ),
+              SizedBox(height: 20), // Adding some spacing
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // background
+                  foregroundColor: Colors.white, // foreground
+                ),
+                onPressed: () {
+                  print("pressed here");
+                  disconnectFromSpotify();
+                },
+                child: Text('Disconnect from Spotify'),
+              ),
+              SizedBox(height: 20), // Adding some spacing
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Color.fromARGB(255, 255, 166, 0), // background
+                  foregroundColor: Colors.white, // foreground
+                ),
+                onPressed: () {
+                  print("pressed here");
+                  startKlub1000();
+                },
+                child: Text('Start Klub 1000'),
+              ),
+              MyPlayerWidget()
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> startKlub1000() async {
+    try {
+      await SpotifySdk.play(
+          spotifyUri: "spotify:playlist:37i9dQZF1DX4dyzvuaRJ0n");
+      _MyPlayerWidgetState()._updatePlayerState();
+      print("Started Klub 1000");
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> disconnectFromSpotify() async {
+    try {
+      await SpotifySdk.disconnect();
+      print("Disconnected from Spotify");
+      Global.isSpotifyConnected = false;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> authenticateWithSpotify() async {
+    try {
+      print(dotenv.env['CLIENT_ID'].toString());
+      await SpotifySdk.connectToSpotifyRemote(
+        clientId: dotenv.env['CLIENT_ID'].toString(),
+        redirectUrl: dotenv.env['REDIRECT_URL'].toString(),
+        scope:
+            "app-remote-control, user-read-playback-state, user-modify-playback-state",
+      );
+      print("Connected to Spotify");
+      Global.isSpotifyConnected = true;
+    } catch (e) {
+      print(e);
+    }
   }
 }
